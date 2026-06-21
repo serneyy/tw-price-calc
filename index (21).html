@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teenwear Price Calculator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --card: #ffffff;
+      --soft: #fafafa;
+      --text: #111111;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --black: #111111;
+      --green: #10b981;
+      --green-bg: #ecfdf5;
+      --orange: #f59e0b;
+      --orange-bg: #fffbeb;
+      --red: #ef4444;
+      --red-bg: #fef2f2;
+      --blue-bg: #eff6ff;
+      --radius: 18px;
+      --shadow: 0 16px 40px rgba(17,17,17,.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Jost", sans-serif;
+      color: var(--text);
+    }
+
+    .wrap {
+      width: 100%;
+      min-height: 100vh;
+      padding: 24px;
+      background: var(--bg);
+    }
+
+    .calc {
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      max-width: 760px;
+    }
+
+    .pill {
+      padding: 9px 13px;
+      border-radius: 999px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .table,
+    .bucket-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .panel-desc {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .panel-inner { padding: 18px; }
+    .section { margin-bottom: 18px; }
+    .section:last-child { margin-bottom: 0; }
+
+    .section-title {
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-full { grid-column: 1 / -1; }
+
+    .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    input,
+    select {
+      width: 100%;
+      height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+      font-family: "Jost", sans-serif;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--black);
+      box-shadow: 0 0 0 3px rgba(17,17,17,.06);
+    }
+
+    input[readonly] {
+      background: var(--soft);
+      color: #374151;
+    }
+
+    .helper {
+      margin-top: 4px;
+      font-size: 11px;
+      line-height: 1.35;
+      color: var(--muted);
+    }
+
+    .results {
+      display: grid;
+      gap: 18px;
+    }
+
+    .price-card {
+      background: var(--black);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .price-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .price-label {
+      font-size: 13px;
+      color: rgba(255,255,255,.68);
+      margin-bottom: 5px;
+    }
+
+    .price-value {
+      font-size: 42px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+
+    .price-meta {
+      margin-top: 10px;
+      color: rgba(255,255,255,.68);
+      font-size: 13px;
+      line-height: 1.45;
+      max-width: 560px;
+    }
+
+    .mode-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .mode-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .auto-btn {
+      border: 1px solid rgba(255,255,255,.24);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-radius: 999px;
+      height: 31px;
+      padding: 0 12px;
+      font-family: "Jost", sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auto-btn:hover { background: rgba(255,255,255,.16); }
+
+    .side-price {
+      text-align: right;
+      min-width: 170px;
+    }
+
+    .side-label {
+      font-size: 12px;
+      color: rgba(255,255,255,.55);
+    }
+
+    .side-value {
+      margin-top: 4px;
+      font-size: 24px;
+      font-weight: 700;
+      color: rgba(255,255,255,.9);
+    }
+
+    .discount-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.12);
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .kpi {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      min-height: 92px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .kpi-value {
+      margin-top: 8px;
+      font-size: 22px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .kpi-note {
+      margin-top: 7px;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .status {
+      border-radius: var(--radius);
+      padding: 15px 16px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    .status.good {
+      background: var(--green-bg);
+      border-color: #bbf7d0;
+      color: #047857;
+    }
+
+    .status.warn {
+      background: var(--orange-bg);
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .status.bad {
+      background: var(--red-bg);
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .bucket-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bucket-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .bucket-sub {
+      margin-top: 2px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .bucket-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px 16px;
+    }
+
+    .bucket {
+      padding: 9px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-family: "Jost", sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+      cursor: pointer;
+    }
+
+    .bucket:hover { border-color: var(--black); }
+    .bucket.active { background: var(--black); border-color: var(--black); color: #fff; }
+    .bucket.low { opacity: .45; }
+    .bucket.low:hover { opacity: .75; }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .table-row:last-child { border-bottom: none; }
+    .table-key { font-size: 13px; color: var(--muted); }
+    .table-value { font-size: 14px; font-weight: 700; text-align: right; }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 14px; }
+      .top, .price-top { flex-direction: column; }
+      .title { font-size: 23px; }
+      .grid, .kpi-grid { grid-template-columns: 1fr; }
+      .side-price { text-align: left; }
+      .price-value { font-size: 36px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="calc" id="calculator">
+      <div class="top">
+        <div>
+          <h1 class="title">Teenwear Price Calculator</h1>
+          <p class="subtitle">
+            Full-price bucket calculator. Buckets are the full website price. Discount is applied after, then rounded to .95, so 42.95 with 30% off becomes 30.95.
+          </p>
+        </div>
+        <div class="pill">Manual bucket testing enabled</div>
+      </div>
+
+      <div class="layout">
+        <section class="panel">
+          <div class="panel-header">
+            <p class="panel-title">Inputs</p>
+            <p class="panel-desc">Enter supplier cost and choose a product type. Click buckets to test different after-code prices.</p>
+          </div>
+
+          <div class="panel-inner">
+            <div class="section">
+              <p class="section-title">Product</p>
+              <div class="grid">
+                <div class="field field-full">
+                  <label class="label">Product type</label>
+                  <select id="productType">
+                    <option value="">Select product type</option>
+                    <option value="T-shirt">T-shirt</option>
+                    <option value="Long Sleeve">Long Sleeve</option>
+                    <option value="Hoodie">Hoodie</option>
+                    <option value="Sweater">Sweater</option>
+                    <option value="Jacket">Jacket</option>
+                    <option value="Puffer Jacket">Puffer Jacket</option>
+                    <option value="Short Bottoms">Short Bottoms</option>
+                    <option value="Long Bottoms">Long Bottoms</option>
+                  </select>
+                </div>
+
+                <div class="field">
+                  <label class="label">Product cost CNY</label>
+                  <input id="priceCNY" type="number" min="0" step="0.01" placeholder="e.g. 60">
+                </div>
+
+                <div class="field">
+                  <label class="label">Weight kg</label>
+                  <input id="productWeight" type="text" readonly>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <p class="section-title">Core assumptions</p>
+              <div class="grid">
+                <div class="field">
+                  <label class="label">CNY per EUR</label>
+                  <input id="exchangeRate" type="text" value="7.76">
+                </div>
+                <div class="field">
+                  <label class="label">Supplier markup</label>
+                  <input id="fulfillmentMarkup" type="text" value="1.2">
+                </div>
+                <div class="field">
+                  <label class="label">Shipping per kg €</label>
+                  <input id="shippingPerKg" type="text" value="14">
+                </div>
+                <div class="field">
+                  <label class="label">Customs €</label>
+                  <input id="customs" type="text" value="3">
+                </div>
+                <div class="field">
+                  <label class="label">VAT %</label>
+                  <input id="vatRate" type="text" value="20">
+                </div>
+                <div class="field">
+                  <label class="label">Target margin %</label>
+                  <input id="targetMargin" type="text" value="45">
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <p class="section-title">Customer shipping tiers</p>
+              <div class="grid">
+                <div class="field">
+                  <label class="label">Reduced shipping from €</label>
+                  <input id="tierOneLimit" type="text" value="49">
+                </div>
+                <div class="field">
+                  <label class="label">Free shipping from €</label>
+                  <input id="tierTwoLimit" type="text" value="89">
+                </div>
+                <div class="field">
+                  <label class="label">Standard shipping €</label>
+                  <input id="standardShipping" type="text" value="9.95">
+                </div>
+                <div class="field">
+                  <label class="label">Reduced shipping €</label>
+                  <input id="reducedShipping" type="text" value="4.95">
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <p class="section-title">Discount and ads</p>
+              <div class="grid">
+                <div class="field">
+                  <label class="label">Discount code</label>
+                  <select id="discount">
+                    <option value="0">No discount</option>
+                    <option value="10">10%</option>
+                    <option value="15">15%</option>
+                    <option value="20">20%</option>
+                    <option value="25">25%</option>
+                    <option value="30" selected>30%</option>
+                    <option value="35">35%</option>
+                    <option value="40">40%</option>
+                    <option value="45">45%</option>
+                    <option value="50">50%</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="label">Profit after ads €</label>
+                  <input id="targetProfitAfterAds" type="text" value="5">
+                </div>
+              </div>
+              <div class="helper">The selected bucket is the after-code price. The calculator shows the full website price you should set on the product page.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="results">
+          <div class="price-card">
+            <div class="price-top">
+              <div>
+                <div class="price-label">Selected after-code product price</div>
+                <div class="price-value" id="afterCode">€0.00</div>
+                <div class="price-meta" id="priceMeta">Enter product data to calculate price.</div>
+                <div class="mode-row">
+                  <span class="mode-pill" id="pricingMode">Auto bucket</span>
+                  <button class="auto-btn" type="button" id="autoButton">Auto price</button>
+                </div>
+              </div>
+
+              <div class="side-price">
+                <div class="side-label">Full website price to set</div>
+                <div class="side-value" id="fullPrice">€0.00</div>
+                <div class="discount-badge" id="badgeDisc">-30%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="kpi-label">Margin incl. customer shipping</div>
+              <div class="kpi-value" id="marginInclShipping">0.0%</div>
+              <div class="kpi-note">Main target metric</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Gross profit incl. shipping</div>
+              <div class="kpi-value" id="grossProfitInclShipping">€0.00</div>
+              <div class="kpi-note">Before ads and fees</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Break-even CPA</div>
+              <div class="kpi-value" id="breakEvenCpa">€0.00</div>
+              <div class="kpi-note">Maximum CPA before zero profit</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-label">Max CPA for target profit</div>
+              <div class="kpi-value" id="maxCpa">€0.00</div>
+              <div class="kpi-note">Keeps selected profit after ads</div>
+            </div>
+          </div>
+
+          <div class="status" id="statusBox">Enter product data to calculate pricing.</div>
+
+          <div class="bucket-box">
+            <div class="bucket-head">
+              <div class="bucket-title">Clickable after-code buckets</div>
+              <div class="bucket-sub" id="bucketSubtitle">Select product type to show bucket range.</div>
+            </div>
+            <div class="bucket-list" id="bucketList"></div>
+          </div>
+
+          <div class="table">
+            <div class="table-row"><div class="table-key">Minimum after-code price needed</div><div class="table-value" id="minimumFullPrice">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Recommended after-code bucket</div><div class="table-value" id="recommendedBucket">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Customer shipping charged</div><div class="table-value" id="shippingCharged">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Customer total after code + shipping</div><div class="table-value" id="customerTotal">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Product cost</div><div class="table-value" id="productCost">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Real shipping cost</div><div class="table-value" id="realShippingCost">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Customs fee</div><div class="table-value" id="customsMetric">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Landed cost</div><div class="table-value" id="landedCost">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Net revenue incl. shipping</div><div class="table-value" id="netRevenueInclShipping">€0.00</div></div>
+            <div class="table-row"><div class="table-key">VAT from total</div><div class="table-value" id="vatAmount">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Gross profit product only</div><div class="table-value" id="grossProfitProductOnly">€0.00</div></div>
+            <div class="table-row"><div class="table-key">Margin product only</div><div class="table-value" id="marginProductOnly">0.0%</div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const productWeights = {
+      "T-shirt": 0.35,
+      "Long Sleeve": 0.45,
+      "Hoodie": 0.80,
+      "Sweater": 0.70,
+      "Jacket": 1.00,
+      "Puffer Jacket": 1.40,
+      "Short Bottoms": 0.45,
+      "Long Bottoms": 0.75
+    };
+
+    const afterCodeBuckets = {
+      "T-shirt": [24.95, 26.95, 28.95, 29.95, 30.95, 32.95, 34.95, 36.95, 39.95, 42.95, 44.95, 46.95],
+      "Long Sleeve": [29.95, 32.95, 34.95, 36.95, 39.95, 42.95, 44.95, 46.95, 49.95],
+      "Hoodie": [44.95, 49.95, 54.95, 59.95, 64.95, 69.95, 74.95, 79.95],
+      "Sweater": [39.95, 42.95, 44.95, 49.95, 54.95, 59.95, 64.95, 69.95],
+      "Jacket": [59.95, 64.95, 69.95, 74.95, 79.95, 84.95, 89.95, 99.95],
+      "Puffer Jacket": [79.95, 84.95, 89.95, 99.95, 109.95, 119.95],
+      "Short Bottoms": [29.95, 34.95, 39.95, 42.95, 44.95, 49.95, 54.95],
+      "Long Bottoms": [39.95, 44.95, 49.95, 54.95, 59.95, 64.95, 69.95]
+    };
+
+    let manualSelectedAfterPrice = null;
+
+    const el = id => document.getElementById(id);
+
+    function parseNumber(value) {
+      if (value === null || value === undefined) return NaN;
+      return parseFloat(String(value).replace(",", ".").replace(/[^\d.-]/g, ""));
+    }
+
+    function money(value) {
+      if (!isFinite(value)) return "€0.00";
+      return "€" + value.toFixed(2);
+    }
+
+    function percent(value) {
+      if (!isFinite(value)) return "0.0%";
+      return value.toFixed(1) + "%";
+    }
+
+    function round95(value) {
+      if (!isFinite(value) || value <= 0) return 0;
+      return Math.ceil(value) - 0.05;
+    }
+
+    function getFullWebsitePrice(afterCodePrice, discountPct) {
+      if (!isFinite(afterCodePrice) || afterCodePrice <= 0) return 0;
+      if (!isFinite(discountPct) || discountPct <= 0) return afterCodePrice;
+      return round95(afterCodePrice / (1 - discountPct / 100));
+    }
+
+    function getShippingCharge(afterCodePrice, tierOneLimit, tierTwoLimit, standardShipping, reducedShipping) {
+      if (afterCodePrice < tierOneLimit) return standardShipping;
+      if (afterCodePrice < tierTwoLimit) return reducedShipping;
+      return 0;
+    }
+
+    function getMetricsForAfterPrice(afterCodePrice, data) {
+      const fullWebsitePrice = getFullWebsitePrice(afterCodePrice, data.discountPct);
+      const shippingCharged = getShippingCharge(afterCodePrice, data.tierOneLimit, data.tierTwoLimit, data.standardShipping, data.reducedShipping);
+      const customerTotal = afterCodePrice + shippingCharged;
+      const productNetRevenue = afterCodePrice / (1 + data.vatDecimal);
+      const totalNetRevenue = customerTotal / (1 + data.vatDecimal);
+      const vatAmount = customerTotal - totalNetRevenue;
+      const grossProfitInclShipping = totalNetRevenue - data.landedCost;
+      const marginInclShipping = (grossProfitInclShipping / totalNetRevenue) * 100;
+      const grossProfitProductOnly = productNetRevenue - data.landedCost;
+      const marginProductOnly = (grossProfitProductOnly / productNetRevenue) * 100;
+
+      return {
+        afterCodePrice,
+        fullWebsitePrice,
+        shippingCharged,
+        customerTotal,
+        productNetRevenue,
+        totalNetRevenue,
+        vatAmount,
+        grossProfitInclShipping,
+        marginInclShipping,
+        grossProfitProductOnly,
+        marginProductOnly
+      };
+    }
+
+    function calculateMinimumAfterPrice(data) {
+      const targetMarginDecimal = data.targetMargin / 100;
+      const targetTotalNet = data.landedCost / (1 - targetMarginDecimal);
+      const targetTotalGross = targetTotalNet * (1 + data.vatDecimal);
+
+      const scenarios = [
+        { min: 0, max: data.tierOneLimit, shipping: data.standardShipping },
+        { min: data.tierOneLimit, max: data.tierTwoLimit, shipping: data.reducedShipping },
+        { min: data.tierTwoLimit, max: Infinity, shipping: 0 }
+      ];
+
+      for (const scenario of scenarios) {
+        const neededAfterCodePrice = targetTotalGross - scenario.shipping;
+        if (neededAfterCodePrice > 0 && neededAfterCodePrice >= scenario.min && neededAfterCodePrice < scenario.max) {
+          return round95(neededAfterCodePrice);
+        }
+      }
+
+      return round95(targetTotalGross);
+    }
+
+    function selectBucket(type, minimumAfterPrice) {
+      const buckets = afterCodeBuckets[type] || [];
+      if (!buckets.length) return minimumAfterPrice;
+      return buckets.find(price => price >= minimumAfterPrice) || buckets[buckets.length - 1];
+    }
+
+    function renderBuckets(type, selectedAfterPrice, minimumAfterPrice) {
+      const list = el("bucketList");
+      const subtitle = el("bucketSubtitle");
+      const buckets = afterCodeBuckets[type] || [];
+      list.innerHTML = "";
+
+      if (!buckets.length) {
+        subtitle.textContent = "Select product type to show bucket range.";
+        return;
+      }
+
+      subtitle.textContent = "Click any after-code " + type + " bucket to test margin and profit.";
+
+      buckets.forEach(price => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "bucket";
+        btn.textContent = money(price);
+        btn.dataset.price = String(price);
+        if (Number(price.toFixed(2)) === Number(selectedAfterPrice.toFixed(2))) btn.classList.add("active");
+        if (price < minimumAfterPrice) btn.classList.add("low");
+        list.appendChild(btn);
+      });
+    }
+
+    function setStatus(type, message) {
+      const box = el("statusBox");
+      box.className = "status";
+      if (type) box.classList.add(type);
+      box.textContent = message;
+    }
+
+    function resetOutputs() {
+      el("afterCode").textContent = "€0.00";
+      el("fullPrice").textContent = "€0.00";
+      el("priceMeta").textContent = "Enter product data to calculate price.";
+      el("pricingMode").textContent = "Auto bucket";
+      el("marginInclShipping").textContent = "0.0%";
+      el("grossProfitInclShipping").textContent = "€0.00";
+      el("breakEvenCpa").textContent = "€0.00";
+      el("maxCpa").textContent = "€0.00";
+      el("minimumFullPrice").textContent = "€0.00";
+      el("recommendedBucket").textContent = "€0.00";
+      el("shippingCharged").textContent = "€0.00";
+      el("customerTotal").textContent = "€0.00";
+      el("productCost").textContent = "€0.00";
+      el("realShippingCost").textContent = "€0.00";
+      el("customsMetric").textContent = "€0.00";
+      el("landedCost").textContent = "€0.00";
+      el("netRevenueInclShipping").textContent = "€0.00";
+      el("vatAmount").textContent = "€0.00";
+      el("grossProfitProductOnly").textContent = "€0.00";
+      el("marginProductOnly").textContent = "0.0%";
+      setStatus("", "Enter product data to calculate pricing.");
+    }
+
+    function calc(clearManual = false) {
+      if (clearManual) manualSelectedAfterPrice = null;
+
+      const type = el("productType").value;
+      const weight = productWeights[type] || 0;
+      el("productWeight").value = weight ? weight.toFixed(2) : "";
+
+      if (!type) {
+        renderBuckets(type, 0, 0);
+        resetOutputs();
+        return;
+      }
+
+      const cny = parseNumber(el("priceCNY").value);
+      const exchangeRate = parseNumber(el("exchangeRate").value);
+      const fulfillmentMarkup = parseNumber(el("fulfillmentMarkup").value);
+      const shippingPerKg = parseNumber(el("shippingPerKg").value);
+      const customs = parseNumber(el("customs").value);
+      const vatRate = parseNumber(el("vatRate").value);
+      const targetMargin = parseNumber(el("targetMargin").value);
+      const tierOneLimit = parseNumber(el("tierOneLimit").value);
+      const tierTwoLimit = parseNumber(el("tierTwoLimit").value);
+      const standardShipping = parseNumber(el("standardShipping").value);
+      const reducedShipping = parseNumber(el("reducedShipping").value);
+      const discountPct = parseNumber(el("discount").value || "0");
+      const targetProfitAfterAds = parseNumber(el("targetProfitAfterAds").value || "0");
+
+      if (
+        isNaN(cny) || isNaN(exchangeRate) || isNaN(fulfillmentMarkup) || isNaN(shippingPerKg) ||
+        isNaN(customs) || isNaN(vatRate) || isNaN(targetMargin) || isNaN(tierOneLimit) ||
+        isNaN(tierTwoLimit) || isNaN(standardShipping) || isNaN(reducedShipping) ||
+        exchangeRate <= 0 || fulfillmentMarkup <= 0 || targetMargin <= 0 || targetMargin >= 90 ||
+        tierTwoLimit <= tierOneLimit
+      ) {
+        renderBuckets(type, 0, 0);
+        resetOutputs();
+        el("productWeight").value = weight ? weight.toFixed(2) : "";
+        return;
+      }
+
+      const productCost = (cny * fulfillmentMarkup) / exchangeRate;
+      const realShippingCost = weight * shippingPerKg;
+      const landedCost = productCost + realShippingCost + customs;
+
+      const data = {
+        vatDecimal: vatRate / 100,
+        targetMargin,
+        discountPct,
+        tierOneLimit,
+        tierTwoLimit,
+        standardShipping,
+        reducedShipping,
+        landedCost
+      };
+
+      const minimumAfterPrice = calculateMinimumAfterPrice(data);
+      const recommendedBucket = selectBucket(type, minimumAfterPrice);
+      const selectedAfterPrice = manualSelectedAfterPrice || recommendedBucket;
+      const metrics = getMetricsForAfterPrice(selectedAfterPrice, data);
+      const maxCpa = metrics.grossProfitInclShipping - targetProfitAfterAds;
+
+      el("afterCode").textContent = money(selectedAfterPrice);
+      el("fullPrice").textContent = money(metrics.fullWebsitePrice);
+      el("badgeDisc").textContent = discountPct > 0 ? "-" + discountPct + "%" : "No discount";
+
+      if (manualSelectedAfterPrice) {
+        el("pricingMode").textContent = "Manual bucket";
+        el("priceMeta").textContent = "Manual after-code price: " + money(selectedAfterPrice) + ". Auto after-code price: " + money(recommendedBucket) + ". Minimum after-code needed: " + money(minimumAfterPrice) + ".";
+      } else {
+        el("pricingMode").textContent = "Auto bucket";
+        el("priceMeta").textContent = "Minimum after-code needed: " + money(minimumAfterPrice) + ". Auto after-code bucket selected: " + money(recommendedBucket) + ".";
+      }
+
+      el("marginInclShipping").textContent = percent(metrics.marginInclShipping);
+      el("grossProfitInclShipping").textContent = money(metrics.grossProfitInclShipping);
+      el("breakEvenCpa").textContent = money(metrics.grossProfitInclShipping);
+      el("maxCpa").textContent = money(maxCpa);
+      el("minimumFullPrice").textContent = money(minimumAfterPrice);
+      el("recommendedBucket").textContent = money(recommendedBucket);
+      el("shippingCharged").textContent = money(metrics.shippingCharged);
+      el("customerTotal").textContent = money(metrics.customerTotal);
+      el("productCost").textContent = money(productCost);
+      el("realShippingCost").textContent = money(realShippingCost);
+      el("customsMetric").textContent = money(customs);
+      el("landedCost").textContent = money(landedCost);
+      el("netRevenueInclShipping").textContent = money(metrics.totalNetRevenue);
+      el("vatAmount").textContent = money(metrics.vatAmount);
+      el("grossProfitProductOnly").textContent = money(metrics.grossProfitProductOnly);
+      el("marginProductOnly").textContent = percent(metrics.marginProductOnly);
+
+      renderBuckets(type, selectedAfterPrice, minimumAfterPrice);
+
+      if (metrics.marginInclShipping >= targetMargin && metrics.grossProfitInclShipping >= 18) {
+        setStatus("good", "Good pricing. This selected after-code bucket keeps the target margin and gives usable contribution profit.");
+      } else if (metrics.marginInclShipping >= targetMargin && metrics.grossProfitInclShipping >= 10) {
+        setStatus("warn", "Acceptable pricing. Margin is okay, but gross profit is still sensitive to CPA.");
+      } else if (metrics.marginInclShipping < targetMargin && metrics.grossProfitInclShipping > 0) {
+        setStatus("warn", "Manual bucket below target margin. It may be usable for bundles, upsells or organic sales, but risky for paid acquisition.");
+      } else {
+        setStatus("bad", "Risky pricing. This after-code bucket is likely too low unless it is part of a larger basket or bundle.");
+      }
+    }
+
+    const inputsResetManual = [
+      "productType", "priceCNY", "exchangeRate", "fulfillmentMarkup", "shippingPerKg", "customs",
+      "vatRate", "targetMargin", "tierOneLimit", "tierTwoLimit", "standardShipping", "reducedShipping", "discount"
+    ];
+
+    inputsResetManual.forEach(id => {
+      el(id).addEventListener("input", () => calc(true));
+      el(id).addEventListener("change", () => calc(true));
+    });
+
+    el("targetProfitAfterAds").addEventListener("input", () => calc(false));
+    el("targetProfitAfterAds").addEventListener("change", () => calc(false));
+
+    el("bucketList").addEventListener("click", event => {
+      const btn = event.target.closest("[data-price]");
+      if (!btn) return;
+      manualSelectedAfterPrice = parseNumber(btn.dataset.price);
+      calc(false);
+    });
+
+    el("autoButton").addEventListener("click", () => {
+      manualSelectedAfterPrice = null;
+      calc(false);
+    });
+
+    resetOutputs();
+  </script>
+</body>
+</html>
